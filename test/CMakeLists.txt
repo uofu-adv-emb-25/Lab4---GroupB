@@ -7,6 +7,15 @@ target_link_libraries(mytest PRIVATE
   unity
 )
 
+add_executable(lab4_test_signal test_signal.c ../src/signal.c unity_config.c)
+target_link_libraries(lab4_test_signal PRIVATE
+  pico_stdlib
+  pico_async_context_freertos
+  FreeRTOS-Kernel-Heap4
+  pico_cyw43_arch_none
+  unity
+)
+
 # The CYW43 is the Wifi/Bluetooth module. If the board is set to pico_w, this
 # variable will be set and the wireless libraries added.
 if(PICO_CYW43_SUPPORTED)
@@ -19,6 +28,8 @@ endif()
 # These are mutually exclusive, only set one.
 pico_enable_stdio_uart(mytest 0)
 pico_enable_stdio_usb(mytest 1)
+pico_enable_stdio_uart(lab4_test_signal 0)
+pico_enable_stdio_usb(lab4_test_signal 1)
 
 # This will speed up the simulation, since data won't be copied from the flash controller.
 # It does make the binary non-persistent on a real microcontroller.
@@ -48,3 +59,5 @@ find_program(PICOTOOL picotool)
 
 add_custom_target(flash_test ${PICOTOOL} load -f $<TARGET_FILE:mytest> DEPENDS mytest)
 add_custom_target(openocd_test ${OPENOCD} -s ${OPENOCD_PATH} -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c 'adapter speed 5000; program "$<TARGET_FILE:mytest>" verify reset exit' DEPENDS mytest)
+
+add_custom_target(flash_test_signal ${PICOTOOL} load -f $<TARGET_FILE:lab4_test_signal> DEPENDS lab4_test_signal)
