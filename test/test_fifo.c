@@ -31,7 +31,10 @@ QueueHandle_t response;
 void handler_task(void *vargs)
 {
     struct task_args *args = (struct task_args *)vargs;
-    fifo_worker_handler(args->request, args->response, args->id);
+    while(1)
+    {
+        fifo_worker_handler(args->request, args->response, args->id);
+    }
 }
 
 void setUp(void)
@@ -134,8 +137,9 @@ void runner_thread (__unused void *args)
 int main (void)
 {
     stdio_init_all();
-    hard_assert(cyw43_arch_init() == PICO_OK);
+    sleep_ms(10000);
     printf("Launching runner\n");
+    hard_assert(cyw43_arch_init() == PICO_OK);
     xTaskCreate(runner_thread, "TestRunner",
                 TEST_RUNNER_STACK_SIZE, NULL, TEST_RUNNER_PRIORITY, NULL);
     vTaskStartScheduler();
